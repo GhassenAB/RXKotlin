@@ -2,6 +2,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.ReplaySubject
 
 fun main(args: Array<String>) {
 
@@ -74,6 +75,33 @@ fun main(args: Array<String>) {
         quotes.onNext(mayThe4thBeWithYou)
 
         println(quotes.value)
+        subscriptions.dispose()
+    }
+
+    exampleOf("ReplaySubject"){
+        val subscriptions = CompositeDisposable()
+        val subject = ReplaySubject.createWithSize<String>(2)
+
+        subject.onNext(useTheForce)
+
+        subscriptions.add(subject.subscribeBy(
+            onNext = { printWithLabel("1)", it) },
+            onError = { printWithLabel("1)", it) },
+            onComplete = { printWithLabel("1)", "Complete") }
+        ))
+
+        subject.onNext(theForceIsStrong)
+        subject.onNext(stayOnTarget)
+
+
+        subscriptions.add(subject.subscribeBy(
+            onNext = { printWithLabel("2)", it) },
+            onError = { printWithLabel("2)", it) },
+            onComplete = { printWithLabel("2)", "Complete") }
+        ))
+
+        subject.onNext(mayThe4thBeWithYou)
+
         subscriptions.dispose()
     }
 }
